@@ -167,7 +167,7 @@ const datasources = await sdk.datasources.listForWorkspace(workspaceId);
 const sqlDatasource = await sdk.datasources.create({
   name: 'Customer Database',
   description: 'Main customer data',
-  organizationId: workspaceId,
+  organizationId: workspaceId, // API expects organizationId property
   datasourceType: 'SQL',
   configuration: {
     host: 'db.company.com',
@@ -214,7 +214,7 @@ Manage processed data and API keys.
 const tamedData = await sdk.tamedData.create({
   name: 'Processed Customer Data',
   description: 'Cleaned and validated customer data',
-  projectId: topicId,
+  projectId: topicId, // API expects projectId property
   datasourceId: datasourceId,
   dataType: 'tabular',
   configuration: { format: 'parquet' }
@@ -224,7 +224,7 @@ const tamedData = await sdk.tamedData.create({
 const tamedDataWithWires = await sdk.tamedData.createWithWires({
   name: 'Connected Data',
   description: 'Data with relationships',
-  projectId: topicId,
+  projectId: topicId, // API expects projectId property
   datasourceId: datasourceId,
   dataType: 'relational'
 }, [
@@ -363,7 +363,7 @@ The SDK throws `DataTamerError` instances with detailed information:
 import { DataTamerError } from '@datatamer/data-tamer-sdk';
 
 try {
-  await sdk.organizations.createWorkspace({ name: '', description: '' });
+  await sdk.workspaces.createWorkspace({ name: '', description: '' });
 } catch (error) {
   if (error instanceof DataTamerError) {
     console.error(`API Error (${error.status}): ${error.message}`);
@@ -398,8 +398,8 @@ import {
 } from '@datatamer/data-tamer-sdk';
 
 // All API responses are properly typed
-const workspaces: Organization[] = await sdk.organizations.listWorkspaces();
-const topic: Project = await sdk.projects.getTopic(topicId);
+const workspaces: Organization[] = await sdk.workspaces.listWorkspaces();
+const topic: Project = await sdk.topics.getTopic(topicId);
 ```
 
 ## Advanced Usage
@@ -464,9 +464,10 @@ See the `/examples` directory for complete working examples:
 
 For support, please check:
 
-1. [API Documentation](https://your-instance.com/api-docs)
-2. [GitHub Issues](https://github.com/your-org/data-tamer-sdk/issues)
-3. [Documentation](https://docs.datatamer.com)
+1. [API Documentation](https://app.datatamer.ai/api-docs)
+2. [GitHub Repository](https://github.com/data-tamer/data-tamer-sdk)
+3. [GitHub Issues](https://github.com/data-tamer/data-tamer-sdk/issues)
+4. [Documentation](https://docs.datatamer.com)
 
 ## License
 
