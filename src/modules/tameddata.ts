@@ -173,42 +173,44 @@ export class TamedDataClient extends BaseClient {
   }
 
   /**
-   * Search stream data (requires API key)
+   * Search stream data using RAG (Retrieval-Augmented Generation) (requires API key)
    */
-  async searchStream(
+  async searchRag(
     tamedDataId: string,
     apiKey: string,
     searchParams: {
-      query?: string;
-      startTime?: string;
-      endTime?: string;
+      question: string;
       limit?: number;
       offset?: number;
+      user_id?: string;
     }
   ): Promise<{
-    results: StreamData[];
-    total: number;
-    hasMore: boolean;
+    message_id: string;
+    success: boolean;
+    results?: any[];
+    error?: string;
   }> {
     // Temporarily set API key for this request
     const originalApiKey = this.config.apiKey;
     this.setApiKey(apiKey);
 
     try {
-      const queryString = new URLSearchParams(
-        Object.entries(searchParams)
-          .filter(([_, value]) => value !== undefined)
-          .reduce((acc, [key, value]) => {
-            acc[key] = value?.toString() || '';
-            return acc;
-          }, {} as Record<string, string>)
-      ).toString();
+      // Prepare the request body according to the API specification
+      const requestBody = {
+        question: searchParams.question,
+        tamed_data_id: tamedDataId,
+        limit: searchParams.limit,
+        offset: searchParams.offset,
+        user_id: searchParams.user_id,
+        timestamp: Math.floor(Date.now() / 1000)
+      };
 
-      const response = await this.get<{
-        results: StreamData[];
-        total: number;
-        hasMore: boolean;
-      }>(`/api/stream/${tamedDataId}/search?${queryString}`);
+      const response = await this.post<{
+        message_id: string;
+        success: boolean;
+        results?: any[];
+        error?: string;
+      }>(`/api/stream/${tamedDataId}/search`, requestBody);
       
       return response;
     } finally {

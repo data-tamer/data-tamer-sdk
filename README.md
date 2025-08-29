@@ -2,6 +2,10 @@
 
 A comprehensive TypeScript SDK for the Data Tamer Dashboard API, providing easy access to all platform features including workspaces, topics, datasources, tamed data, AI conversations, billing, and real-time events.
 
+## Documentation
+
+📖 **[Complete API Reference](API_REFERENCE.md)** - Comprehensive documentation of all SDK methods, parameters, return types, and examples.
+
 ## Installation
 
 ```bash
@@ -247,10 +251,8 @@ await sdk.tamedData.sendToStream(tamedDataId, apiKey.apiKey, {
 });
 
 // Search stream data
-const searchResults = await sdk.tamedData.searchStream(tamedDataId, apiKey.apiKey, {
-  query: 'processed:true',
-  startTime: '2024-01-01T00:00:00Z',
-  endTime: '2024-01-02T00:00:00Z',
+const searchResults = await sdk.tamedData.searchRag(tamedDataId, apiKey.apiKey, {
+  question: 'Find all processed data from January 1st to January 2nd',
   limit: 100
 });
 ```

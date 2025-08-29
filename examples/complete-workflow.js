@@ -210,17 +210,21 @@ async function completeWorkflowExample() {
 
     for (const query of searchQueries) {
       try {
-        const searchResults = await userSdk.tamedData.searchStream(
+        const searchResults = await userSdk.tamedData.searchRag(
           tamedData.id,
           streamApiKey.apiKey,
           {
-            query: query,
+            question: query,
             limit: 5
           }
         );
 
-        console.log(`   🔍 Search for "${query}":`);
-        console.log(`      Found ${searchResults.results.length} results (total: ${searchResults.total})`);
+        console.log(`   🔍 RAG search for "${query}":`);
+        console.log(`      Message ID: ${searchResults.message_id}`);
+        console.log(`      Success: ${searchResults.success}`);
+        if (searchResults.results) {
+          console.log(`      Found ${searchResults.results.length} results`);
+        }
         
         searchResults.results.forEach((result, index) => {
           console.log(`      ${index + 1}. ID: ${result.content?.id || 'N/A'}`);
