@@ -455,10 +455,11 @@ console.log('Service Status:', health.services);
 
 See the `/examples` directory for complete working examples:
 
-- [Basic Usage](examples/basic-usage.js)
-- [Data Pipeline](examples/data-pipeline.js)
-- [Real-time Dashboard](examples/realtime-dashboard.js)
-- [AI Assistant](examples/ai-assistant.js)
+- [Basic Usage](examples/basic-usage.js) - Complete SDK overview with all modules
+- [Real-time Dashboard](examples/realtime-dashboard.js) - Live event monitoring
+- [API Token Management](examples/api-token-management.js) - Token creation and security
+- [AI Conversation](examples/ai-conversation.js) - Interactive AI conversations
+- [Complete Workflow](examples/complete-workflow.js) - End-to-end workflow from login to RAG search
 
 ## Support
 

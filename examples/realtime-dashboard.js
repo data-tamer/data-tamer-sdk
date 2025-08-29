@@ -1,27 +1,27 @@
-const DataTamerSDK = require('data-tamer-sdk').default;
+const DataTamerSDK = require('@datatamer/data-tamer-sdk').default;
 
 async function realtimeDashboardExample() {
-  // Initialize SDK
+  // Initialize SDK with API token
   const sdk = new DataTamerSDK({
-    baseUrl: 'http://localhost:3000',
-    sessionToken: 'your-session-token-here'
+    baseUrl: 'https://app.datatamer.ai/api',
+    apiKey: 'your-api-token-here' // Get from account settings
   });
 
   console.log('🚀 Starting Real-time Dashboard Example\n');
 
   try {
     // Get basic data first
-    const organizations = await sdk.organizations.list();
-    if (organizations.length === 0) {
-      console.log('❌ No organizations found. Please create one first.');
+    const workspaces = await sdk.workspaces.listWorkspaces();
+    if (workspaces.length === 0) {
+      console.log('❌ No workspaces found. Please create one first.');
       return;
     }
 
-    const org = organizations[0];
-    const projects = await sdk.projects.list(org.id);
+    const workspace = workspaces[0];
+    const topics = await sdk.topics.listTopics(workspace.id);
     
-    console.log(`📊 Monitoring organization: ${org.name}`);
-    console.log(`📁 Projects: ${projects.length}`);
+    console.log(`📊 Monitoring workspace: ${workspace.name}`);
+    console.log(`📁 Topics: ${topics.length}`);
     console.log();
 
     // Set up real-time connection
@@ -73,10 +73,10 @@ async function realtimeDashboardExample() {
       console.log();
     });
 
-    // 3. Project updates
-    const unsubscribeProjects = sdk.realtime.onProjectUpdates((update) => {
-      console.log('📁 PROJECT UPDATE:');
-      console.log(`   Project ID: ${update.projectId}`);
+    // 3. Topic updates
+    const unsubscribeTopics = sdk.realtime.onProjectUpdates((update) => {
+      console.log('📁 TOPIC UPDATE:');
+      console.log(`   Topic ID: ${update.projectId}`);
       console.log(`   Event: ${update.event}`);
       console.log(`   Details: ${JSON.stringify(update.details, null, 2)}`);
       console.log(`   Time: ${new Date().toLocaleTimeString()}`);
@@ -125,9 +125,9 @@ async function realtimeDashboardExample() {
     // Create some test data to trigger events (if applicable)
     setTimeout(async () => {
       try {
-        // Try to create a project action to potentially trigger events
-        if (projects.length > 0) {
-          await sdk.projects.addAction(projects[0].id, {
+        // Try to create a topic action to potentially trigger events
+        if (topics.length > 0) {
+          await sdk.topics.addTopicAction(topics[0].id, {
             name: 'Real-time Test Action',
             description: 'Action created by real-time dashboard example',
             actionType: 'test',
@@ -146,23 +146,27 @@ async function realtimeDashboardExample() {
         console.log('📈 Refreshing dashboard data...');
         
         // Get latest stats
-        const [currentOrgs, currentProjects, currentDatasources] = await Promise.all([
-          sdk.organizations.list(),
-          sdk.projects.list(org.id),
-          sdk.datasources.list(org.id)
+        const [currentWorkspaces, currentTopics, currentDatasources] = await Promise.all([
+          sdk.workspaces.listWorkspaces(),
+          sdk.topics.listTopics(workspace.id),
+          sdk.datasources.listForWorkspace(workspace.id)
         ]);
 
         console.log(`📊 DASHBOARD REFRESH (${new Date().toLocaleTimeString()}):`);
-        console.log(`   Organizations: ${currentOrgs.length}`);
-        console.log(`   Projects: ${currentProjects.length}`);
+        console.log(`   Workspaces: ${currentWorkspaces.length}`);
+        console.log(`   Topics: ${currentTopics.length}`);
         console.log(`   Datasources: ${currentDatasources.length}`);
 
-        // Get project stats if we have projects
-        if (currentProjects.length > 0) {
-          const projectStats = await sdk.projects.getStats(currentProjects[0].id);
-          console.log(`   Project Users: ${projectStats.totalUsers}`);
-          console.log(`   Project Actions: ${projectStats.totalActions}`);
-          console.log(`   Tamed Data: ${projectStats.totalTamedData}`);
+        // Get topic stats if we have topics
+        if (currentTopics.length > 0) {
+          try {
+            const topicStats = await sdk.topics.getTopicStats(currentTopics[0].id);
+            console.log(`   Topic Users: ${topicStats.totalUsers}`);
+            console.log(`   Topic Actions: ${topicStats.totalActions}`);
+            console.log(`   Tamed Data: ${topicStats.totalTamedData}`);
+          } catch (error) {
+            console.log(`   Topic stats not available`);
+          }
         }
 
         console.log();
@@ -191,7 +195,7 @@ async function realtimeDashboardExample() {
       // Unsubscribe from events
       unsubscribeNotifications();
       unsubscribeDatasources();
-      unsubscribeProjects();
+      unsubscribeTopics();
       unsubscribeAI();
       unsubscribeFiltered();
       
@@ -223,8 +227,8 @@ function showUsage() {
   console.log(`
 Real-time Dashboard Example Usage:
 
-1. Make sure your Data Tamer Dashboard is running
-2. Update the sessionToken in the code with a valid token
+1. Make sure you have access to your DataTamer account
+2. Update the apiKey in the code with your API token from account settings
 3. Run: node realtime-dashboard.js
 
 This example will:
@@ -237,7 +241,7 @@ This example will:
 Events monitored:
 - 🔔 Notifications
 - 🗄️ Datasource updates  
-- 📁 Project updates
+- 📁 Topic updates
 - 🤖 AI responses
 - ⚠️ Error events
 
